@@ -11,11 +11,6 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return CustomUser.objects.create_user(**validated_data)
 
-    def validate_email(self, value):
-        if not(self._validate_st_mail(value)):
-            raise serializers.ValidationError('incorrect email')
-        return value
-
     @staticmethod
     def check_user(data):
         email = data.get('email')
@@ -23,14 +18,8 @@ class UserSerializer(serializers.ModelSerializer):
         if not(email and existing_user):
             return
         if existing_user.is_active:
-            raise serializers.ValidationError('such an email already exists')
+            raise serializers.ValidationError('Пользователь с такой почтой уже зарегестрирован')
         existing_user.delete()
-
-    @staticmethod
-    def _validate_st_mail(email):
-        if email.startswith('st') and email.endswith('@student.spbu.ru'):
-            return True
-        return False
 
 class EmailConfirmationSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -41,18 +30,18 @@ class EmailConfirmationSerializer(serializers.Serializer):
         code = data.get('code')
 
         if not EmailConfirmation.objects.filter(email=email).exists():
-            raise serializers.ValidationError('there is no user with this email address')
+            raise serializers.ValidationError('Не существует пользователя с таким именем')
 
         if CustomUser.objects.get(email=email).is_active:
-            raise serializers.ValidationError('the email has already been confirmed')
+            raise serializers.ValidationError('Эта почта уже подтверждена')
 
         email_confirmation: EmailConfirmation = EmailConfirmation.objects.get(email=email)
         if email_confirmation.is_code_expired():
             CustomUser.objects.get(email=email).delete()
-            raise serializers.ValidationError('the email confirmation time has expired')
+            raise serializers.ValidationError('Истекло время действия кода, зарегистрируйтесь заново')
 
         if email_confirmation.code != code:
-            raise serializers.ValidationError('invalid confirmation code')
+            raise serializers.ValidationError('Неверный код')
 
         return data
 

@@ -20,7 +20,7 @@ class RegisterView(APIView):
             email_confirmation = EmailConfirmation(email=user)
             email_confirmation.save()
             email_confirmation.send_email()
-            return Response({'message': 'The user has been created and is waiting for email confirmation'}, status=status.HTTP_201_CREATED)
+            return Response({'message': 'Пользователь создан и ожидает подтверждения почты'}, status=status.HTTP_201_CREATED)
         return Response(user_serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
@@ -37,13 +37,10 @@ class ConfirmEmailView(APIView):
         user = serializer.get_user(email)
         user.activate()
         refresh = RefreshToken.for_user(user)
-        tokens = {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
-        }
         return Response({
-            "message": "User registered successfully.",
-            "tokens": tokens,
+            "message": "Почта подтверждена, пользователь теперь активен",
+            "access": str(refresh),
+            "refresh": str(refresh.access_token)
         }, status=status.HTTP_201_CREATED)
 
 class ActiveUser(APIView):
