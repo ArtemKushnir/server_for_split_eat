@@ -4,7 +4,6 @@ from .models import CustomUser, EmailConfirmation
 
 
 class UserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = CustomUser
         fields = ["email", "username", "password"]
