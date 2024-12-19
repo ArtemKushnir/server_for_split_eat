@@ -1,5 +1,7 @@
 from rest_framework import serializers
+
 from .models import Cart, CartItem
+
 
 # Сериализатор для CartItem
 class CartItemSerializer(serializers.Serializer):
@@ -9,7 +11,8 @@ class CartItemSerializer(serializers.Serializer):
 
     class Meta:
         model = CartItem
-        fields = ['name', 'price', 'quantity']
+        fields = ["name", "price", "quantity"]
+
 
 # Сериализатор для CartRequest
 class CartSerializer(serializers.Serializer):
@@ -17,7 +20,7 @@ class CartSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         # Извлекаем вложенные данные продуктов
-        products_data = validated_data.pop('products')
+        products_data = validated_data.pop("products")
 
         # Создаем объект Cart
         cart = Cart.objects.create(**validated_data)
@@ -31,4 +34,4 @@ class CartSerializer(serializers.Serializer):
 
     class Meta:
         model = Cart
-        fields = ['products']
+        fields = ["products"]
