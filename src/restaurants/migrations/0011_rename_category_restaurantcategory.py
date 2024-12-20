@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("restaurants", "0010_alter_menucategory_name_and_more"),
     ]

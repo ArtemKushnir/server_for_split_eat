@@ -5,7 +5,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("restaurants", "0007_menucategory_alter_product_category"),
     ]

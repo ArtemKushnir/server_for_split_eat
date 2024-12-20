@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("restaurants", "0005_product_weight_unit_alter_product_calories_and_more"),
     ]
