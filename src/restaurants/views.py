@@ -4,7 +4,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Category, Restaurant
+from .models import MenuCategory, Restaurant, RestaurantCategory
 from .serializers import RestaurantSerializer
 
 
@@ -22,10 +22,10 @@ class RestaurantsListView(APIView):
         search_text = request.query_params.get("search", None)
         if category_name:
             try:
-                category = Category.objects.get(name=category_name)
+                category = RestaurantCategory.objects.get(name=category_name)
                 restaurants = Restaurant.objects.filter(categories=category)
-            except Category.DoesNotExist:
-                return Response({"detail": "Category not found"}, status=status.HTTP_404_BAD_REQUEST)
+            except RestaurantCategory.DoesNotExist:
+                return Response({"detail": "Category not found"}, status=status.HTTP_404_NOT_FOUND)
         elif search_text:
             restaurants = Restaurant.objects.filter(name=search_text)
         else:
@@ -39,9 +39,29 @@ class RestaurantsListView(APIView):
         return paginator.get_paginated_response(serializer.data)
 
 
-class CategoryListView(APIView):
+class RestaurantCategoryListView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        categories = {"categories": [category.name for category in Category.objects.all()]}
+        categories = {"categories": [category.name for category in RestaurantCategory.objects.all()]}
         return Response(categories, status=status.HTTP_200_OK)
+
+
+class MenuCategoryListView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        restaurant_name = request.query_params.get("restaurant", None)
+        if restaurant_name:
+            restaurant = Restaurant.objects.get(name=restaurant_name)
+            categories = {
+                "categories": [category.name for category in MenuCategory.objects.filter(restaurant=restaurant)]
+            }
+            return Response(categories, status=status.HTTP_200_OK)
+
+
+class RestaurantMenuListView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        restaurant = request.query_params.get("restaurant")

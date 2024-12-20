@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from ...adding_restaurants import add_restaurants
+from ...adding_restaurants_script import add_restaurants
 
 
 class Command(BaseCommand):
