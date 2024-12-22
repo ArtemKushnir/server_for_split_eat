@@ -1,11 +1,13 @@
+from django.contrib.postgres.search import TrigramSimilarity
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import MenuCategory, Restaurant, RestaurantCategory, Product
-from .serializers import RestaurantSerializer, RestaurantMenuSerializer
+from .models import MenuCategory, Product, Restaurant, RestaurantCategory
+from .serializers import RestaurantMenuSerializer, RestaurantSerializer
 
 
 class RestaurantPagination(PageNumberPagination):
@@ -24,7 +26,16 @@ class RestaurantsListView(APIView):
             category = RestaurantCategory.objects.get(name=category_name)
             restaurants = Restaurant.objects.filter(categories=category)
         elif search_text:
-            restaurants = Restaurant.objects.filter(name=search_text)
+            restaurants = (
+                Restaurant.objects.annotate(
+                    similarity_name=TrigramSimilarity("name", search_text),
+                    similarity_categories=TrigramSimilarity("categories__name", search_text),
+                )
+                .filter(Q(similarity_name__gt=0.3) | Q(similarity_categories__gt=0.2))
+                .order_by("name", "-similarity_name", "-similarity_categories")
+                .distinct("name")
+            )
+
         else:
             restaurants = Restaurant.objects.all()
 
@@ -70,7 +81,14 @@ class RestaurantMenuListView(APIView):
             category = MenuCategory.objects.get(name=category_name, restaurant=restaurant)
             products = Product.objects.filter(restaurant=restaurant, category=category)
         elif search_text:
-            products = Product.objects.filter(restaurant=restaurant, name=search_text)
+            products = (
+                Product.objects.annotate(
+                    similarity_name=TrigramSimilarity("name", search_text),
+                    similarity_category=TrigramSimilarity("category__name", search_text),
+                )
+                .filter(Q(similarity_name__gt=0.2) | Q(similarity_category__gt=0.2))
+                .order_by("-similarity_name", "-similarity_category")
+            )
         else:
             products = Product.objects.filter(restaurant=restaurant)
 

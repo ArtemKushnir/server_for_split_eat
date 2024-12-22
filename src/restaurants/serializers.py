@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Restaurant, Product
+from .models import Product, Restaurant
 
 
 class RestaurantSerializer(serializers.ModelSerializer):
@@ -13,11 +13,13 @@ class RestaurantSerializer(serializers.ModelSerializer):
     def get_categories(self, obj):
         return [category.name for category in obj.categories.all()]
 
+
 class RestaurantMenuSerializer(serializers.ModelSerializer):
     category = serializers.SerializerMethodField
 
     class Meta:
         model = Product
         fields = ["name", "image", "price", "weight", "weight_unit", "calories"]
+
     def get_category(self, obj):
         return obj.category.name

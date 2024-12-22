@@ -1,3 +1,4 @@
+from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 
 
@@ -12,6 +13,11 @@ class RestaurantCategory(models.Model):
 
     objects = RestaurantCategoryManager()
 
+    class Meta:
+        indexes = [
+            GinIndex(fields=["name"], name="category_name_gin_idx", opclasses=["gin_trgm_ops"]),
+        ]
+
 
 class Restaurant(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -19,6 +25,11 @@ class Restaurant(models.Model):
     logo = models.URLField()
     free_shipping_price = models.IntegerField()
     categories = models.ManyToManyField(RestaurantCategory, related_name="restaurants")
+
+    class Meta:
+        indexes = [
+            GinIndex(fields=["name"], name="name_restaurant_gin_index", opclasses=["gin_trgm_ops"]),
+        ]
 
     def __str__(self):
         return self.name
@@ -37,6 +48,10 @@ class MenuCategory(models.Model):
     class Meta:
         unique_together = ("name", "restaurant")
 
+        indexes = [
+            GinIndex(fields=["name"], name="name_menu_category_gin_index", opclasses=["gin_trgm_ops"]),
+        ]
+
     objects = MenuCategoryManager()
 
     def __str__(self):
@@ -52,3 +67,8 @@ class Product(models.Model):
     weight = models.FloatField(default=0, null=True)
     weight_unit = models.CharField(null=True)
     calories = models.FloatField(default=0, null=True)
+
+    class Meta:
+        indexes = [
+            GinIndex(fields=["name"], name="name_product_gin_index", opclasses=["gin_trgm_ops"]),
+        ]
