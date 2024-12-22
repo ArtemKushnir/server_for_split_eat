@@ -4,8 +4,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import MenuCategory, Restaurant, RestaurantCategory
-from .serializers import RestaurantSerializer
+from .models import MenuCategory, Restaurant, RestaurantCategory, Product
+from .serializers import RestaurantSerializer, RestaurantMenuSerializer
 
 
 class RestaurantPagination(PageNumberPagination):
@@ -21,11 +21,8 @@ class RestaurantsListView(APIView):
         category_name = request.query_params.get("category", None)
         search_text = request.query_params.get("search", None)
         if category_name:
-            try:
-                category = RestaurantCategory.objects.get(name=category_name)
-                restaurants = Restaurant.objects.filter(categories=category)
-            except RestaurantCategory.DoesNotExist:
-                return Response({"detail": "Category not found"}, status=status.HTTP_404_NOT_FOUND)
+            category = RestaurantCategory.objects.get(name=category_name)
+            restaurants = Restaurant.objects.filter(categories=category)
         elif search_text:
             restaurants = Restaurant.objects.filter(name=search_text)
         else:
@@ -64,4 +61,18 @@ class RestaurantMenuListView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        restaurant = request.query_params.get("restaurant")
+        restaurant_name = request.query_params.get("restaurant")
+        category_name = request.query_params.get("category", None)
+        search_text = request.query_params.get("search", None)
+
+        restaurant = Restaurant.objects.get(name=restaurant_name)
+        if category_name:
+            category = MenuCategory.objects.get(name=category_name, restaurant=restaurant)
+            products = Product.objects.filter(restaurant=restaurant, category=category)
+        elif search_text:
+            products = Product.objects.filter(restaurant=restaurant, name=search_text)
+        else:
+            products = Product.objects.filter(restaurant=restaurant)
+
+        serializer = RestaurantMenuSerializer(products, many=True)
+        return Response({"products": serializer.data}, status.HTTP_200_OK)
