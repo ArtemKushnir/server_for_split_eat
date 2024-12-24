@@ -12,7 +12,7 @@ class CartItemAdmin(admin.ModelAdmin):
 
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
-    list_display = ("id", "restaurant", "total_price", "status", "created_at")
+    list_display = ("id", "user", "restaurant", "total_price", "status", "created_at")
     search_fields = ("restaurant__name",)
     list_filter = ("status", "restaurant", "created_at")
     filter_horizontal = ("products",)

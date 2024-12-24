@@ -1,9 +1,8 @@
+from django.conf import settings
 from django.db import models
 from django.utils.timezone import now
 
 from restaurants.models import Product, Restaurant
-
-# from src.authentication.models import CustomUser
 
 
 class CartItem(models.Model):
@@ -14,7 +13,7 @@ class CartItem(models.Model):
 class Cart(models.Model):
     STATUS_CHOICES = ((None, "Not matched"), (True, "Matched"), (False, "Close"))
 
-    # user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, verbose_name="Пользователь")
+    user = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Пользователь")
     restaurant = models.ForeignKey(
         to=Restaurant, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Ресторан"
     )
