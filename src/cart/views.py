@@ -8,7 +8,7 @@ from .serializers import CartSerializer
 
 
 class CartView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request: Request):
         cart_serializer = CartSerializer(data=request.data, context={"request": request})
