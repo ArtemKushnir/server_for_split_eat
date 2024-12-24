@@ -12,6 +12,7 @@ class CartView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request: Request):
+        print(request.data)
         cart_serializer = CartSerializer(data=request.data)
         if cart_serializer.is_valid():
             cart = cart_serializer.save()
