@@ -17,7 +17,7 @@ class RestaurantPagination(PageNumberPagination):
 
 
 class RestaurantsListView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         category_name = request.query_params.get("category", None)
@@ -48,7 +48,7 @@ class RestaurantsListView(APIView):
 
 
 class RestaurantCategoryListView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         categories = {"categories": [category.name for category in RestaurantCategory.objects.all()]}
@@ -56,7 +56,7 @@ class RestaurantCategoryListView(APIView):
 
 
 class MenuCategoryListView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         restaurant_name = request.query_params.get("restaurant", None)
@@ -69,7 +69,7 @@ class MenuCategoryListView(APIView):
 
 
 class RestaurantMenuListView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         restaurant_name = request.query_params.get("restaurant")

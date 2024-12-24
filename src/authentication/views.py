@@ -1,3 +1,5 @@
+from operator import truediv
+
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
@@ -5,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import EmailConfirmation
+from .models import EmailConfirmation, CustomUser
 from .serializers import EmailConfirmationSerializer, UserSerializer
 
 
@@ -48,8 +50,12 @@ class ConfirmEmailView(APIView):
         )
 
 
-class ActiveUser(APIView):
-    permission_classes = [IsAuthenticated]
+class GetStatusView(APIView):
+    permission_classes = [AllowAny]
 
-    def get(self, request):
-        return Response(data="yes", status=status.HTTP_200_OK)
+    def post(self, request: Request):
+        email = request.data.get("email", None)
+        if email:
+            user: CustomUser = CustomUser.objects.get(email=email)
+            return Response({"is_staff": user.is_staff}, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)

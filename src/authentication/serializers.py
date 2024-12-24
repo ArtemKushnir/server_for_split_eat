@@ -51,3 +51,4 @@ class EmailConfirmationSerializer(serializers.Serializer):
         user = CustomUser.objects.filter(email=email).first()
         if user:
             return user
+
