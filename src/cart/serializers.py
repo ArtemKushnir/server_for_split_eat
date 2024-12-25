@@ -57,7 +57,7 @@ class ActiveOrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cart
-        fields = ['id', 'user', 'restaurant', 'products', 'total_price', 'status', 'created_at']
+        fields = ["id", "user", "restaurant", "products", "total_price", "status", "created_at"]
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -70,4 +70,10 @@ class ActiveOrderSerializer(serializers.ModelSerializer):
         return obj.restaurant.name if obj.restaurant else None
 
     def get_products(self, obj):
-        return [{"id_product": {"name": product.id_product.name, "image": product.id_product.image}, "quantity": str(product.quantity)} for product in obj.products.all()]
+        return [
+            {
+                "id_product": {"name": product.id_product.name, "image": product.id_product.image},
+                "quantity": str(product.quantity),
+            }
+            for product in obj.products.all()
+        ]

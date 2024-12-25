@@ -1,25 +1,24 @@
 import logging
 
 import requests
+from django.conf import settings
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.conf import settings
+
+from authentication.models import CustomUser
 
 from .models import Cart
-from .serializers import CartSerializer, ActiveOrderSerializer
-from authentication.models import CustomUser
+from .serializers import ActiveOrderSerializer, CartSerializer
 
 
 class CartPagination(PageNumberPagination):
     page_size = 5
     page_size_query_param = "page_size"
     max_page_size = 100
-
-
 
 
 class CartView(APIView):
@@ -84,6 +83,7 @@ class ActiveUserOrdersView(APIView):
 
 class CompletedUserOrderView:
     pass
+
 
 # class AdminOrdersView(APIView):
 #     permission_classes = [AllowAny]
