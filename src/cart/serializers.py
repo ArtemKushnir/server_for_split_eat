@@ -47,3 +47,27 @@ class CartSerializer(serializers.Serializer):
     class Meta:
         model = Cart
         fields = ["restaurant", "products", "total_price"]
+
+
+class ActiveOrderSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    status = serializers.CharField()
+    restaurant = serializers.SerializerMethodField()
+    products = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Cart
+        fields = ['id', 'user', 'restaurant', 'products', 'total_price', 'status', 'created_at']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        return representation
+
+    def get_user(self, obj):
+        return obj.user.email
+
+    def get_restaurant(self, obj):
+        return obj.restaurant.name if obj.restaurant else None
+
+    def get_products(self, obj):
+        return [{"id_product": {"name": product.id_product.name, "image": product.id_product.image}, "quantity": str(product.quantity)} for product in obj.products.all()]
